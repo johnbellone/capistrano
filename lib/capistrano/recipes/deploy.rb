@@ -129,6 +129,12 @@ end
 def run_locally(cmd)
   logger.trace "executing locally: #{cmd.inspect}" if logger
   output_on_stdout = nil
+  hostname = nil
+  cmd = cmd.gsub(/\$CAPISTRANO:HOST\$/) do |s|
+    hostname = `hostname` unless hostname
+    s = hostname
+  end
+  cmd = cmd.gsub!(/\$CAPISTRANO:HOSTROLES\$/, roles.join(',')) if roles
   elapsed = Benchmark.realtime do
     output_on_stdout = `#{cmd}`
   end
